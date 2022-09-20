@@ -3,7 +3,7 @@
 This Magento 2 module integrates the [Sentry sdk](https://github.com/getsentry/sentry-php) into magento 2. Depending on the log level configured in the backend of magento 2, notifications and errors can be send to sentry.
 
 ## Installation
-- `composer require justbetter/magento2-sentry`
+- `composer require webidea24/magento2-sentry`
 - `bin/magento module:enable JustBetter_Sentry`
 - `bin/magento setup:upgrade`
 - `bin/magento setup:di:compile`
