@@ -36,7 +36,8 @@ class Data extends AbstractHelper
         'js_sdk_version',
         'tracing_enabled',
         'tracing_sample_rate',
-        'ignore_js_errors'
+        'ignore_js_errors',
+        'prevent_reporting_after_unload'
     ];
 
     /**
@@ -343,5 +344,10 @@ class Data extends AbstractHelper
         }
 
         return true;
+    }
+
+    public function isPreventReportingAfterUnload(): bool
+    {
+        return (bool) ($this->config['prevent_reporting_after_unload'] ?? false);
     }
 }

@@ -24,7 +24,8 @@ This module uses the [Magento Deployment Configuration](https://devdocs.magento.
     'js_sdk_version' => \JustBetter\Sentry\Block\SentryScript::CURRENT_VERSION
     'tracing_enabled' => true, 
     'tracing_sample_rate' => 0.5,
-    'ignore_js_errors' => []
+    'ignore_js_errors' => [],
+    'prevent_reporting_after_unload' => false
 ]
 ```
 
@@ -41,6 +42,7 @@ Next to that there are some configuration options under Stores > Configuration >
 * `tracing_enabled` if this option is set to true, tracing got enabled (bundle file got loaded automatically). Default: `false`
 * `tracing_sample_rate` if tracing is enabled, you should also set the sample rate. Default: `0.2`
 * `ignore_js_errors` array of javascript error messages, which should be not send to Sentry.
+* `prevent_reporting_after_unload` if this option is set to `true`, no errors will be reported after unload event. Can be useful, when the user navigates to an different page, during loading of resources by requirejs. 
 
 ## Optional error page configuration
 - Optional you can configure custom error pages in pub/errors. You can use the sentry feedback form and insert here the sentry log ID. The Sentry Log Id is captured in de customer session and can be retrieved in `processor.php`.

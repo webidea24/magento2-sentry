@@ -170,4 +170,9 @@ class SentryScript extends Template
     {
         return $this->json->serialize($this->dataHelper->getIgnoreJsErrors());
     }
+
+    public function isPreventReportingAfterUnload(): bool
+    {
+        return $this->dataHelper->isPreventReportingAfterUnload();
+    }
 }
