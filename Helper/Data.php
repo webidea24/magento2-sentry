@@ -12,10 +12,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\App\State;
-use Magento\Framework\DB\Adapter\TableNotFoundException;
-use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Exception\RuntimeException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -255,26 +252,20 @@ class Data extends AbstractHelper
         if (isset($this->config[$storeId]['enabled'])) {
             return $this->config[$storeId];
         }
-
-        try {
-            $this->config[$storeId]['enabled'] = $this->scopeConfig->getValue('sentry/environment/enabled', ScopeInterface::SCOPE_STORE)
-                ?? $this->deploymentConfig->get('sentry') !== null;
-        } catch (TableNotFoundException|FileSystemException|RuntimeException|DomainException|Zend_Db_Adapter_Exception $e) {
-            $this->config[$storeId]['enabled'] = $this->deploymentConfig->get('sentry') !== null;
-        }
+        $this->config[$storeId]['enabled'] = $this->deploymentConfig->get('sentry') !== null;
 
         foreach ($this->configKeys as $key => $config) {
-            try {
-                $value = $this->scopeConfig->getValue('sentry/environment/'.$key, ScopeInterface::SCOPE_STORE)
-                    ?? $this->deploymentConfig->get('sentry/'.$key);
-            } catch (TableNotFoundException|FileSystemException|RuntimeException|DomainException|Zend_Db_Adapter_Exception $e) {
-                $value = $this->deploymentConfig->get('sentry/'.$key);
-            }
+            $this->config[$storeId][$key] = $this->processConfigValue($this->deploymentConfig->get('sentry/'.$key), $config);
+        }
 
-            $this->config[$storeId][$key] = $this->processConfigValue(
-                $value,
-                $config
-            );
+        if ($this->scopeConfig->isSetFlag('sentry/environment/override', ScopeInterface::SCOPE_STORE, $storeId)) {
+            $allowedConfigKeys = array_merge(['enabled'], $this->configKeys);
+            $scopeConfig = $this->scopeConfig->getValue('sentry/environment', ScopeInterface::SCOPE_STORE, $storeId);
+            foreach ($scopeConfig as $key => $value) {
+                if ($value !== null && array_key_exists($key, $allowedConfigKeys)) {
+                    $this->config[$storeId][$key] = $this->processConfigValue($value, $allowedConfigKeys[$key]);
+                }
+            }
         }
 
         return $this->config[$storeId];
